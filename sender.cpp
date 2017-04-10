@@ -7,6 +7,9 @@
 #include <stdexcept>
 #include <iostream>
 
+//Fuck je moeder
+
+
 using namespace std;
 
 int sendPacket(string ip, uint port, string group){
