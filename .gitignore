@@ -1,2 +1,5 @@
 /Socket/thread.cpp
-
+.cproject
+.project
+/.settings
+/Debug
