@@ -18,6 +18,7 @@ int sendPacket(string ip, uint port, string group){
 
 	try
 	{
+
 		/**
 		 * Create a new datagram socket 
 		 */

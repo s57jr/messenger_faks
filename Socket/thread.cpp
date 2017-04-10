@@ -8,7 +8,7 @@
 #include "BlockingQueue.h"
 
 #define PORT 14000 //The port you want to use
-#define IP "192.168.5.3" //The IP address of this computer
+#define IP "192.168.5.4" //The IP address of this computer
 #define GROUP "228.0.0.0" //The multicast group you want to use
 
 using namespace std;
