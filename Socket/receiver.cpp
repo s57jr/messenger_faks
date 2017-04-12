@@ -10,13 +10,11 @@
 #include <cstring>
 
 using namespace std;
-/**
- * Opens the socket, attach it to an interface and join the multicast group
- */
-int get_receive_socket( string ip, uint16_t port, string group ) {
-	/**
-	 * Create a new datagram socket
-	 */
+
+int get_receive_socket( string ip, uint16_t port, string group ) { //Only for setting up the connection
+
+	 //Create a new UDP socket
+
 	int retsock;
 	if ((retsock = socket(AF_INET, SOCK_DGRAM, 0)) < 0) //Get a IPv4 (AF_INET) socket for UDP packets (SOCK_DGRAM)
 		throw std::runtime_error("Failed to create socket!");
@@ -54,7 +52,7 @@ int get_receive_socket( string ip, uint16_t port, string group ) {
 	return retsock;
 }
 
-int receivePacket(string ip, uint port, string group, BlockingQueue<std::string> &q) 
+int receivePacket(string ip, uint port, string group, BlockingQueue<std::string> &q) //For receiving the package
 {
 	try
 	{
