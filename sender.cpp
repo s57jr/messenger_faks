@@ -7,9 +7,6 @@
 #include <stdexcept>
 #include <iostream>
 
-//Fuck je moeder
-
-
 using namespace std;
 
 int sendPacket(string ip, uint port, string group){
@@ -18,7 +15,6 @@ int sendPacket(string ip, uint port, string group){
 
 	try
 	{
-
 		/**
 		 * Create a new datagram socket 
 		 */
@@ -54,7 +50,7 @@ int sendPacket(string ip, uint port, string group){
 
 		//send a packet every 5 seconds
 		while(1){
-			std::string bla = "Brazzers";
+			std::string bla = "Blablabla";
 
 			if (sendto(sock, bla.c_str(), bla.size(), 0, (struct sockaddr*)&multicastSender,sizeof(struct sockaddr_in)) < 0) //sent a UDP packet containing our example data
 				    perror("Sendto failed");

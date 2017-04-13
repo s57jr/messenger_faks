@@ -10,12 +10,17 @@ Vector_routing::Vector_routing():
 
 
 /*  PACKET STRUCTURE
-* type | add1  | add2
-* dest | hop1  | hop2
-*
-*
-*
+* type      | add1  | add2
+* dest      | hop1  | hop2
+* src_add
+*  add_a
+*  add_a
 */
+
+int32_t Vector_routing::get_destination_address(int32_t destination){
+    int index = search_in_row(my_table, 0, destination);
+    return my_table[index][2];
+}
 
 
 void Vector_routing::tick(std::vector<std::vector<uint32_t>> packet, std::vector<std::vector<uint32_t> > &pkt_out){
@@ -23,7 +28,7 @@ void Vector_routing::tick(std::vector<std::vector<uint32_t>> packet, std::vector
 
     for (int32_t i = 0; i < packet.size(); i++) {
 
-        int32_t neighbour = 123456789;//packet.getSourceAddress();                   // from whom is the packet?
+        int32_t neighbour = my_table[0][2];//packet.getSourceAddress();                   // from whom is the packet?
 
         bool in = false;
         NInfo curr;
@@ -55,13 +60,13 @@ void Vector_routing::tick(std::vector<std::vector<uint32_t>> packet, std::vector
 
 
         if(!packet[0][0]){                                              //is this broadcast?
-            if (!search_in_row(my_table, 0 , neighbour)){              //already in table?
+            if (search_in_row(my_table, 0 , neighbour) == -1){              //already in table?
                 std::vector<uint32_t> tmp ={neighbour, neighbour};
                 my_table.push_back(tmp);
             }
         }else if(packet[0][0]){                                         //table packet
             for(int g =1; g < packet.size();g++){
-                if(search_in_row(my_table, 0 , packet[g][0])){
+                if(search_in_row(my_table, 0 , packet[g][0]) != -1){
                     //the entry is already here
                 }else{                                                  //path through neighbour found, make sure not to advertise it back
                     if(packet[g][0] != neighbour){
@@ -130,22 +135,66 @@ void Vector_routing::tick(std::vector<std::vector<uint32_t>> packet, std::vector
     }
 }
 
-bool Vector_routing::search_for(std::vector<uint32_t> vect, uint32_t value){
+int Vector_routing::search_for(std::vector<uint32_t> vect, uint32_t value){ 	//return index or -1 if not found
     for(int i = 0 ; i < vect.size(); i++){
         if(vect.at(i) == value){
-            return true;
+            return i;
         }
     }
-    return false;
+    return -1;
 }
 
-bool Vector_routing::search_in_row(std::vector<std::vector<uint32_t>> vect,int row, uint32_t value){
+int Vector_routing::search_in_row(std::vector<std::vector<uint32_t>> vect,int row, uint32_t value){ //return index or -1 if not found
     for(int i = 0 ; i < vect.size(); i++){
         if(vect[i][row] == value){
-            return true;
+            return i;
         }
     }
-    return false;
+    return -1;
+}
+
+void Vector_routing::create_sendable_table(std::vector<std::vector<int32_t>> &packet_to_conv, std::string &out_string){
+
+    for(int u =0; u< packet_to_conv.size();u++){
+        for(int i=0; i < packet_to_conv[u].size();){
+            if(i){
+                out_string+="|";
+            }
+            out_string+=(std::to_string(packet_to_conv[u][i]));
+        }
+        out_string+="&";
+        std::cout << out_string << std::endl;
+    }
+}
+
+void Vector_routing::receive_string_table(std::string  string_to_conv, std::vector<std::vector<int32_t>> &in_packet){
+    std::string::size_type sz;
+    for(int u =0; u< 3 ;u++){
+          std::size_t found = string_to_conv.find_first_of("|");
+          int a =0;
+          while (found!=std::string::npos)
+          {
+            std::string entry;
+         //   string_to_conv.copy(entry,found-1);
+            for(int z =0; z < static_cast<int>(found-1);z++){
+                entry[z]=string_to_conv[z];
+            }
+
+            in_packet[u][a] = std::stoi (entry,&sz);
+            a++;
+            string_to_conv.erase(0,found);
+            found=string_to_conv.find_first_of("|");
+          }
+          found=string_to_conv.find_first_of("&");
+          std::string entry;
+          for(int z =0; z < static_cast<int>(found-1);z++){
+              entry[z]=string_to_conv[z];
+          }
+          in_packet[u][a] = std::stoi (entry,&sz);
+
+          string_to_conv.erase(0,found);
+
+    }
 }
 
 
