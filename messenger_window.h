@@ -10,14 +10,20 @@
 #include <QtWidgets>
 #include <QWidget>
 #include "ComSender.h"
-
+#include "rec.h"
+#include <mutex>
 
 #include "messagedisplay.h"
+
+
+
+extern BlockingQueue<std::string> q;
 
 class QLineEdit;
 
 class MessageDisplay;
 class ComSender;
+class Rec;
 
 class Messenger_window : public QWidget
 {
@@ -28,14 +34,17 @@ public:
     void setLineEditTextFormat(QLineEdit* lineEdit, const QList<QTextLayout::FormatRange>& formats);
 
     QTimer *my_time;
+    QThread *my_thread;
+    QThread *recv;
     std::thread t;
+
 signals:
 
 
 public slots:
     void set_display_object();
     void set_type_object();
-    void send_msg();
+    void rcv_msg();
 
 private slots:
     void emoji_chosen_food();
@@ -44,13 +53,14 @@ private slots:
 
 
 private:
-    MessageDisplay  *my_display;
     QLineEdit       *line_to_write;
     QGroupBox       *display_object;
     QGroupBox       *type_object;
     QComboBox       *comboBox_food;
     QComboBox       *comboBox_fun;
     ComSender       *senderClass;
+    Rec             *myrec;
+    MessageDisplay  *my_display;
 
 };
 

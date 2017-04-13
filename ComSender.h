@@ -16,14 +16,18 @@
 #include <stdexcept>
 #include <iostream>
 #include <thread>
+#include <QWidget>
 //#include "Protocol.h"
 
 
-class ComSender {
+class ComSender : public QObject{
+
+       Q_OBJECT
 public:
 	ComSender(std::string ip, uint port, std::string group);
-	virtual ~ComSender();
+    ~ComSender();
 	int SendMessage(std::string message);
+public slots:
 	int SendPacket();
 private:
 	//const uint32_t CASHSIZE         =   2500;

@@ -5,9 +5,6 @@
 #include <unistd.h>
 #include <iostream>
 
-#include "receiver.h"
-#include "BlockingQueue.h"
-
 
 
 
@@ -26,7 +23,3 @@ int main(int argc, char *argv[])
    return a.exec();
 }
 
-//void check_queue(){
-//    std::string message = q.pop();
-//    std::cout << "Packet of size " << message.size() << " received, message: " << message << std::endl;
-//}

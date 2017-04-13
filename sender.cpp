@@ -55,7 +55,7 @@ int sendPacket(string ip, uint port, string group){
 			if (sendto(sock, bla.c_str(), bla.size(), 0, (struct sockaddr*)&multicastSender,sizeof(struct sockaddr_in)) < 0) //sent a UDP packet containing our example data
 				    perror("Sendto failed");
 			printf("Packet of size %d sent!\n", (int)bla.size());
-			sleep(5);
+            sleep(1);
 		}
 	} catch(std::exception &e)
 	{

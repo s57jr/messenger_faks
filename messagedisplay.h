@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QtWidgets>
 #include <QFile>
+#include <mutex>
 
 #include "messenger_window.h"
 

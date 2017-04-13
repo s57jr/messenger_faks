@@ -1,20 +1,14 @@
-#include "receiver.h"
+#include "rec.h"
 
-/*
-Receiver::Receiver(std::string ip, uint port, std::string group, BlockingQueue<std::string> &q){
-        this->ip = ip;
-        this->port = port;
-        this->group = group;
-        this->message = "";
-        this->q=q;
-    }
-/*
-Receiver::~Receiver(){
-
+Rec::Rec(std::string ip, uint port, std::string group)
+{
+    this->ip = ip;
+    this->port = port;
+    this->group = group;
+    this->message = "";
 }
 
-
-int Receiver::get_receive_socket() {
+int Rec::get_receive_socket() {
 
     int retsock;
     if ((retsock = socket(AF_INET, SOCK_DGRAM, 0)) < 0) //Get a IPv4 (AF_INET) socket for UDP packets (SOCK_DGRAM)
@@ -44,7 +38,7 @@ int Receiver::get_receive_socket() {
     return retsock;
 }
 
-int Receiver::receivePacket()
+int Rec::receivePacket()
 {
     try
     {
@@ -66,8 +60,13 @@ int Receiver::receivePacket()
             // Receive packet and put its contents in data, recvfrom will block until a packet for this socket has been received
             len = recvfrom(rsock, data, sizeof(data), 0, (struct sockaddr *) &peer_address, &peer_address_len);
             if(len > 0){
+                mut.lock();
                 q.push(std::string(data, len));
+                message = q.pop();
+                mut.unlock();
+                std::cout << "Packet of size " << message.size() << " received, message: " << message << std::endl;
             }
+            sleep(1);
         }
     } catch(std::exception &e)
     {
@@ -76,4 +75,4 @@ int Receiver::receivePacket()
     }
 
     return 0;
-}*/
+}

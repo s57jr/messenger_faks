@@ -211,9 +211,6 @@ ComSender::ComSender(std::string ip, uint port, std::string group) {
 	this->port = port;
 	this->group = group;
 	this->message = "";
-	std::thread t1(&ComSender::SendPacket, this);
-
-		    t1.join();
 
 }
 
@@ -330,11 +327,10 @@ int ComSender::SendPacket(){
 		multicastSender.sin_family = AF_INET;
 		multicastSender.sin_addr.s_addr = inet_addr(group.c_str());
 		multicastSender.sin_port = htons(port);
+        std::cout << "Packet of size" << "data.size()"<< "sent!" << std::endl;
 
 		//send a packet every 5 seconds
 	while(1){
-        std::cout << "Packet of size sent!" << std::endl;
-
 		if(this->message.size() > 0){
 			std::string data = message;
 			if (sendto(sock, data.c_str(), data.size(), 0, (struct sockaddr*)&multicastSender,sizeof(struct sockaddr_in)) < 0) //sent a UDP packet containing our example data

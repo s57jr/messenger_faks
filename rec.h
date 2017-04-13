@@ -1,6 +1,5 @@
-#ifndef RECEIVER_H
-#define RECEIVER_H
-
+#ifndef REC_H
+#define REC_H
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -13,23 +12,20 @@
 #include <QObject>
 #include <QWidget>
 #include "BlockingQueue.h"
-/*
+#include "messenger_window.h"
+#include "messagedisplay.h"
 
-class Receiver : public QObject
+class MessageDisplay;
+
+class Rec : public QObject
 {
     Q_OBJECT
 public:
-    Receiver(std::string ip, uint port, std::string group, BlockingQueue<std::string> &q)
-    {
-            this->ip = ip;
-            this->port = port;
-            this->group = group;
-            this->message = "";
-            this->q=q;
-    }
-    ~Receiver();
+    explicit Rec(std::string ip, uint port, std::string group);
     int get_receive_socket();
 
+    std::string message;
+    std::mutex mut;
 signals:
 
 public slots:
@@ -39,9 +35,6 @@ private:
     std::string ip;
     std::string group;
     uint port;
-    std::string message;
-    BlockingQueue<std::string> q;
 };
-*/
-#endif // RECEIVER_H
 
+#endif // REC_H

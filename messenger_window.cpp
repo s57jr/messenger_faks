@@ -4,6 +4,8 @@
 #include <cstring>
 #include <unistd.h>
 #include <iostream>
+#include "receiver.h"
+#include "BlockingQueue.h"
 
 
 #include "BlockingQueue.h"
@@ -13,6 +15,8 @@
 #define GROUP "228.0.0.0" //The multicast group you want to use
 
 BlockingQueue<std::string> q;
+
+
 
 Messenger_window::Messenger_window(QWidget *parent) : QWidget(parent)
 {
@@ -42,26 +46,46 @@ Messenger_window::Messenger_window(QWidget *parent) : QWidget(parent)
 
     setWindowTitle(tr("MessengerPro2"));
 
-    ComSender senderClass(IP,PORT,GROUP) ;
+    senderClass = new ComSender(IP,PORT,GROUP) ;
+    myrec = new Rec(IP,PORT,GROUP);
 
-    t=std::thread(&ComSender::SendPacket,&senderClass);
+
 
     std::cout << "Pqwetrqwertqewrtqwertzq   wt!" << std::endl;
 
+    recv = new QThread;
+    myrec->moveToThread(recv);
+    connect(recv,SIGNAL(started()),myrec,SLOT(receivePacket()));
+    recv->start();
 
-    senderClass.SendMessage("message77");
+    my_thread = new QThread;
+    senderClass->moveToThread(my_thread);
+    connect(my_thread,SIGNAL(started()),senderClass,SLOT(SendPacket()));
+    my_thread->start();
 
-    QTimer *my_time = new QTimer(this);
-    connect(my_time,SIGNAL(timeout()),this,SLOT(send_msg()));
-    my_time->start(100);
+    my_time = new QTimer(this);
+    connect(my_time,SIGNAL(timeout()),this,SLOT(rcv_msg()));
+    my_time->start(400);
+
 
 
 }
 
-void  Messenger_window::send_msg(){
-    std::cout << "Packet of size sent!" << std::endl;
 
-    senderClass->SendMessage("message77");
+
+void  Messenger_window::rcv_msg(){
+  //  std::string message = q.pop();
+  //  std::cout << "Packet of size " << message.size() << " received, message: " << message << std::endl;
+
+    if(myrec->message.size()){
+        myrec->mut.lock();
+                QString qs = QString::fromLocal8Bit(myrec->message.c_str());
+
+                myrec->message = "";
+        myrec->mut.unlock();
+        my_display->insertPlainText("Person said: " + qs + "\n");
+
+    }
 
 }
 
@@ -111,40 +135,13 @@ void Messenger_window::emoji_chosen_fun(){
 }
 
 void Messenger_window::send_text(){
-    // send(line_to_write->text();)
     if(!((line_to_write->text() == " ")||(line_to_write->text()== "  ")||(line_to_write->text() == "   ")||(line_to_write->text() == "    ")||(line_to_write->text() == "     ")||(line_to_write->text() == ""))){
         my_display->insertPlainText("You said: " + line_to_write->text() + "\n");
+        senderClass->SendMessage(line_to_write->text().toStdString());
+
     }
     line_to_write ->clear();
 
-    line_to_write->setStyleSheet("color: red");
-    my_display->setStyleSheet("color: red");
-/*
-    line_to_write->setText(tr("Task Tracker - Entry"));
-
-    QList<QTextLayout::FormatRange> formats;
-
-    QTextCharFormat f;
-
-    f.setFontWeight(QFont::Bold);
-    QTextLayout::FormatRange fr_task;
-    fr_task.start = 0;
-    fr_task.length = 4;
-    fr_task.format = f;
-
-    f.setFontItalic(true);
-    f.setBackground(Qt::darkYellow);
-    f.setForeground(Qt::white);
-    QTextLayout::FormatRange fr_tracker;
-    fr_tracker.start = 5;
-    fr_tracker.length = 7;
-    fr_tracker.format = f;
-
-    formats.append(fr_task);
-    formats.append(fr_tracker);
-
-    setLineEditTextFormat(line_to_write, formats);
-*/
 }
 
 void Messenger_window::setLineEditTextFormat(QLineEdit* lineEdit, const QList<QTextLayout::FormatRange>& formats)
