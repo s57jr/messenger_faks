@@ -339,7 +339,7 @@ int ComSender::SendPacket(){
 
 		}
 		this->message = "";
-		sleep(5);
+        sleep(1);
 	}
 
 	} catch(std::exception &e)

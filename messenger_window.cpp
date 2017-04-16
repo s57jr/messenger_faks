@@ -10,10 +10,6 @@
 
 #include "BlockingQueue.h"
 
-#define PORT 14000 //The port you want to use
-#define IP "192.168.5.2" //The IP address of this computer
-#define GROUP "228.0.0.0" //The multicast group you want to use
-
 BlockingQueue<std::string> q;
 
 
@@ -46,31 +42,11 @@ Messenger_window::Messenger_window(QWidget *parent) : QWidget(parent)
 
     setWindowTitle(tr("MessengerPro2"));
 
-    senderClass = new ComSender(IP,PORT,GROUP) ;
-    myrec = new Rec(IP,PORT,GROUP);
-
-
-
-    std::cout << "Pqwetrqwertqewrtqwertzq   wt!" << std::endl;
-
-    recv = new QThread;
-    myrec->moveToThread(recv);
-    connect(recv,SIGNAL(started()),myrec,SLOT(receivePacket()));
-    recv->start();
-
-    my_thread = new QThread;
-    senderClass->moveToThread(my_thread);
-    connect(my_thread,SIGNAL(started()),senderClass,SLOT(SendPacket()));
-    my_thread->start();
-
     my_time = new QTimer(this);
     connect(my_time,SIGNAL(timeout()),this,SLOT(rcv_msg()));
     my_time->start(400);
 
-
-
 }
-
 
 
 void  Messenger_window::rcv_msg(){
@@ -137,11 +113,9 @@ void Messenger_window::emoji_chosen_fun(){
 void Messenger_window::send_text(){
     if(!((line_to_write->text() == " ")||(line_to_write->text()== "  ")||(line_to_write->text() == "   ")||(line_to_write->text() == "    ")||(line_to_write->text() == "     ")||(line_to_write->text() == ""))){
         my_display->insertPlainText("You said: " + line_to_write->text() + "\n");
-        senderClass->SendMessage(line_to_write->text().toStdString());
-
+       // senderClass->SendMessage(line_to_write->text().toStdString());
     }
     line_to_write ->clear();
-
 }
 
 void Messenger_window::setLineEditTextFormat(QLineEdit* lineEdit, const QList<QTextLayout::FormatRange>& formats)

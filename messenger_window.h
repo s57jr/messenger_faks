@@ -38,6 +38,8 @@ public:
     QThread *recv;
     std::thread t;
 
+    std::vector<uint16_t> sequence_nr;
+
 signals:
 
 

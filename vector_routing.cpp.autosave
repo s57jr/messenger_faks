@@ -45,7 +45,14 @@ Vector_routing::Vector_routing():
 */
 
 void Vector_routing::rcv_msg(){
-
+    
+    std::vector<std::string> received_package = decompose_package(pkg_in); 
+    if(std::stoi(received_package[0]) == myIPaddress){
+        
+    }else{
+        
+    }
+    
 }
 
 
