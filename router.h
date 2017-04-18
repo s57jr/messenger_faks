@@ -41,6 +41,9 @@ public:
     std::vector<std::vector<uint32_t>> my_table;
 
     void  add_to_array(std::string id);
+    void  add_ack_to_array(std::string id);
+    bool is_it_in_ack(std::string sequence);
+
 
     std::vector<std::string> out_string;
     std::vector<std::string> in_string;
@@ -68,8 +71,11 @@ private:
     bool is_it_in(std::string sequence);
     char my_address;
     bool ACK;
-    std::vector<std::string> seq_blacklist = std::vector<std::string>(10);
+    std::vector<std::string> seq_blacklist = std::vector<std::string>(100);
+    std::vector<std::string> seq_ack_blacklist = std::vector<std::string>(100);
+
     int bl_p;
+    int bl_p_ack;
     char sender;
     uint8_t sequenceNr;
     int step;

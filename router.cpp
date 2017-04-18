@@ -6,7 +6,8 @@ router::router(QObject *parent) : QObject(parent),
   sequenceNr(10),
   my_address(IP[IP.size()-1]),
   bl_p(0),
-  ACK(false)
+  ACK(false),
+  bl_p_ack(0)
 
 {
 
@@ -31,7 +32,7 @@ router::router(QObject *parent) : QObject(parent),
 
   my_timer = new QTimer(this);
   connect(my_timer,SIGNAL(timeout()),this,SLOT(rcve_msg()));
-  my_timer->start(100);
+  my_timer->start(5);
 
 }
 
@@ -55,48 +56,66 @@ void router::rcve_msg(){
               myrec->message = "";
       myrec->mut.unlock();
 
+      std::cout << "printing rec." << to_d <<std::endl;
+
       std::string id;// = received_package[1]+received_package[2]+received_package[3];
 
-      id.assign(received_package[1],1);
-      id.assign(received_package[2],1);
-      id.assign(received_package[3],1);
+      id.assign(to_d[1],1);
+      id.assign(to_d[2],1);
+      id.assign(to_d[3],1);
 
-      char destination = received_package[0];
+      char destination = to_d[0];
+      char source = to_d[1];
 
-      if(received_package[4]=='t'){
+      std::cout << destination << std::endl;
+
+      if(to_d[4]=='t'){
           ACK = true;
       }else{
           ACK = false;
       }
 
-      if(!is_it_in(id)){
+      if((!is_it_in(id)&&!ACK)||(!is_it_in_ack(id)&&ACK)){
 
           if(destination == my_address){
 
               if(!ACK){
-                  received_package[4] = 't';
-                  received_package[0] = received_package[1];
-                  received_package[1] = destination;
-                  senderClass->SendMessage(received_package);
+                  std::cout << "this is not ack" << std::endl;
+
+                  to_d[4] = 't';
+                  to_d[0] = source;
+                  to_d[1] = destination;
+                  senderClass->SendMessage(to_d);
                   m.lock();
                       message_to_disp =  to_d;
                   m.unlock();
-                  std::cout << "receiving this: " << message_to_disp << std::endl;
+                  std::cout << "receiving this: " << to_d << std::endl;
+                  add_to_array(id);
 
                   //write to display
               }else{
+                  std::cout << "this is ack" << std::endl;
+                  add_ack_to_array(id);
                   //write acked message to display
                   m.lock();
                       my_message_to_disp = to_d;
                   m.unlock();
-                  std::cout << "acking this: " << my_message_to_disp << std::endl;
+                  std::cout << "acking this: " << to_d << std::endl;
 
               }
-          }else{
-              senderClass->SendMessage(received_package);
+          }else if(source != my_address){
+              std::cout << "this is not for me" << std::endl;
+
+              if(ACK){
+                  add_ack_to_array(id);
+              }else{
+                  add_to_array(id);
+              }
+
+              senderClass->SendMessage(to_d);
           }
-          add_to_array(id);
       }
+
   }
 }
 
@@ -122,6 +141,21 @@ bool router::is_it_in(std::string sequence){
           return true;
       }
   }
+}
+
+bool router::is_it_in_ack(std::string sequence){
+  for(int i =0;i< seq_ack_blacklist.size(); i++){
+      if(sequence == seq_ack_blacklist[i]){
+          //drop the package
+          return true;
+      }
+  }
+}
+
+void  router::add_ack_to_array(std::string id){
+  if(bl_p_ack == 9 )bl_p_ack=0;
+  seq_ack_blacklist[bl_p_ack]=id;
+  bl_p_ack++;
 }
 
 void  router::add_to_array(std::string id){

@@ -61,8 +61,8 @@ int Rec::receivePacket()
             len = recvfrom(rsock, data, sizeof(data), 0, (struct sockaddr *) &peer_address, &peer_address_len);
             if(len > 0){
                 mut.lock();
-                q.push(std::string(data, len));
-                message = q.pop();
+                //q.push(std::string(data, len));
+                message = std::string(data, len); //q.pop();
                 mut.unlock();
                 std::cout << "Packet of size " << message.size() << " received, message: " << message << std::endl;
             }
