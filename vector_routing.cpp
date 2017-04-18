@@ -3,12 +3,17 @@
 
 
 #define PORT 14000 //The port you want to use
-#define IP "192.168.5.2" //The IP address of this computer
+const std::string IP="192.168.5.2"; //The IP address of this computer
 #define GROUP "228.0.0.0" //The multicast group you want to use
 
 
 Vector_routing::Vector_routing():
-    step(0)
+    step(0),
+    sender(0),
+    sequenceNr(10),
+    my_address(IP[IP.size()-1]),
+    bl_p(0),
+    ACK(false)
 {
 
     senderClass = new ComSender(IP,PORT,GROUP) ;
@@ -46,6 +51,71 @@ Vector_routing::Vector_routing():
 
 void Vector_routing::rcv_msg(){
 
+
+    if(myrec->message.size()){
+        myrec->mut.lock();
+                QString qs = QString::fromLocal8Bit(myrec->message.c_str());
+                received_package = myrec->message.c_str();
+                myrec->message = "";
+        myrec->mut.unlock();
+        my_display->insertPlainText("Person said: " + qs + "\n");
+
+        std::string id = received_package[1]+received_package[2]+received_package[3];
+
+        std::string destination = received_package[0];
+
+        if(received_package[4]=="t"){
+            ACK = true;
+        }else{
+            ACK = false;
+        }
+
+        if(!is_it_in(id)){
+
+            if(destination == my_address){
+
+                if(!ACK){
+                    received_package[4] = "t";
+                    received_package[0] = received_package[1];
+                    received_package[1] = destination;
+                    senderClass->SendMessage(received_package);
+                    //write to display
+                }else{
+                    //write acked message to display
+                }
+            }else{
+                senderClass->SendMessage(received_package);
+            }
+            add_to_array();
+        }
+    }
+}
+
+
+void Vector_routing::send_text(std::string text, char dest){
+    std::string package_to_send = "";
+    package_to_send+=dest;
+    package_to_send+=my_address;
+    package_to_send+=std::to_string(sequenceNr);
+    package_to_send+="f";
+    package_to_send+=text;
+    if(sequenceNr==99)sequenceNr=9;
+    sequenceNr+=1;
+}
+
+bool Vector_routing::is_it_in(std::string sequence){
+    for(inz i =0;i< seq_blacklist.size(); i++){
+        if(sequence == seq_blacklist[i]){
+            //drop the package
+            return true;
+        }
+    }
+}
+
+void  Vector_routing::add_to_array(std::string id){
+    if(bl_p == 9 )bl_p=0;
+    seq_blacklist[p]=id;
+    bl_p++;
 }
 
 

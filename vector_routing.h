@@ -35,30 +35,38 @@ public:
 
     std::vector<std::vector<uint32_t>> my_table;
 
-     std::vector<std::string> out_string;
-     std::vector<std::string> in_string;
+    std::vector<std::string> out_string;
+    std::vector<std::string> in_string;
 
 
-     QTimer *my_time;
-     QThread *my_thread;
-     QThread *recv;
-     std::thread t;
+    QTimer *my_time;
+    QThread *my_thread;
+    QThread *recv;
+    std::thread t;
 
 
-     std::vector<std::string>  decompose_package(std::string packet_in);
+    std::vector<std::string>  decompose_package(std::string packet_in);
 
 private slots:
 
-     void rcv_msg();
+    void rcv_msg();
 
 
 private:
+    std::string received_package;
+    bool is_it_in(std::string sequence);
+    char my_address;
+    bool ACK;
+    std::vector<std::string> seq_blacklist = std::vector<std::string>(10);
+    int bl_p;
+    char sender;
+    uint8_t sequenceNr;
     int step;
     std::vector<std::vector<int32_t>> in_packet;
 
     struct NInfo{
         uint32_t address;
-          time_t last;
+        time_t last;
     };
 
     ComSender       *senderClass;
