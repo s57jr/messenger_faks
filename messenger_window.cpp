@@ -42,7 +42,7 @@ Messenger_window::Messenger_window(QWidget *parent) : QWidget(parent)
 
     setWindowTitle(tr("MessengerPro2"));
 
-    router = new Vector_routing;
+    router1 = new router;
 
     my_time = new QTimer(this);
     connect(my_time,SIGNAL(timeout()),this,SLOT(rcv_msg()));
@@ -55,18 +55,18 @@ void  Messenger_window::rcv_msg(){
   //  std::string message = q.pop();
   //  std::cout << "Packet of size " << message.size() << " received, message: " << message << std::endl;
 
-    if(router->message_to_disp.size()){
-        router->m.lock();
-                QString qs = QString::fromLocal8Bit(router->message_to_disp.c_str());
-                router->message_to_disp = "";
-        router->m.unlock();
+    if(router1->message_to_disp.size()){
+        router1->m.lock();
+                QString qs = QString::fromLocal8Bit(router1->message_to_disp.c_str());
+                router1->message_to_disp = "";
+        router1->m.unlock();
         my_display->insertPlainText("Person said: " + qs + "\n");
 
-    }else if(router->my_message_to_disp.size()){
-        router->m.lock();
-                QString qs = QString::fromLocal8Bit(router->my_message_to_disp.c_str());
-                router->message_to_disp = "";
-        router->m.unlock();
+    }else if(router1->my_message_to_disp.size()){
+        router1->m.lock();
+                QString qs = QString::fromLocal8Bit(router1->my_message_to_disp.c_str());
+                router1->message_to_disp = "";
+        router1->m.unlock();
         my_display->insertPlainText("You said: " + qs + "\n");
     }
 
@@ -121,7 +121,8 @@ void Messenger_window::send_text(){
     if(!((line_to_write->text() == " ")||(line_to_write->text()== "  ")||(line_to_write->text() == "   ")||(line_to_write->text() == "    ")||(line_to_write->text() == "     ")||(line_to_write->text() == ""))){
         //my_display->insertPlainText("You said: " + line_to_write->text() + "\n");
        // senderClass->SendMessage(line_to_write->text().toStdString());
-        router->send_text(line_to_write->text().toStdString(), '4');
+        std::cout << "sending" << std::endl;
+        router1->send_text(line_to_write->text().toStdString(), "4");
     }
     line_to_write ->clear();
 }
@@ -144,6 +145,40 @@ void Messenger_window::setLineEditTextFormat(QLineEdit* lineEdit, const QList<QT
     QCoreApplication::sendEvent(lineEdit, &event);
 
 }
+
+void Messenger_window::create_buttons(){
+
+    choose_rec_object = new QGroupBox(tr("choose receiver"));
+
+
+    ip1=new QCheckBox;
+    ip2=new QCheckBox;
+    ip3=new QCheckBox;
+    ip4=new QCheckBox;
+    multicast=new QCheckBox;
+
+    ip1_label = new QLabel(tr("Florian"));
+    ip2_label = new QLabel(tr("Jost"));
+    ip3_label = new QLabel(tr("Ernest"));
+    ip4_label = new QLabel(tr("Raoul"));
+    multicast_label = new QLabel;
+
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(ip1,1,1,1,1);
+    layout->addWidget(ip2,1,2,1,1);
+    layout->addWidget(ip3,1,3,1,1);
+    layout->addWidget(ip4,1,4,1,1);
+    layout->addWidget(multicast,5,1,1,1);
+
+    layout->addWidget(ip1_label,2,1,1,1);
+    layout->addWidget(ip2_label,2,1,1,1);
+    layout->addWidget(ip3_label,2,1,1,1);
+    layout->addWidget(ip4_label,2,1,1,1);
+    layout->addWidget(multicast_label,2,1,1,1);
+
+  //  type_object->setLayout(layout);
+}
+
 void Messenger_window::clearLineEditTextFormat(QLineEdit* lineEdit)
 {
     setLineEditTextFormat(lineEdit, QList<QTextLayout::FormatRange>());

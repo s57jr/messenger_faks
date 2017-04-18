@@ -1,9 +1,7 @@
 #include "vector_routing.h"
 
-
-
+/*
 #define PORT 14000 //The port you want to use
-const std::string IP="192.168.5.2"; //The IP address of this computer
 #define GROUP "228.0.0.0" //The multicast group you want to use
 
 
@@ -13,16 +11,16 @@ Vector_routing::Vector_routing():
     sequenceNr(10),
     my_address(IP[IP.size()-1]),
     bl_p(0),
-    ACK(false),
-    message_to_disp(""),
-    my_message_to_disp(""),
-    received_package("")
+    ACK(false)
+
 {
 
     senderClass = new ComSender(IP,PORT,GROUP) ;
     myrec = new Rec(IP,PORT,GROUP);
 
-
+    message_to_disp="";
+    my_message_to_disp="";
+    received_package="";
 
     std::cout << "Pqwetrqwertqewrtqwertzq   wt!" << std::endl;
 
@@ -36,23 +34,16 @@ Vector_routing::Vector_routing():
     connect(my_thread,SIGNAL(started()),senderClass,SLOT(SendPacket()));
     my_thread->start();
 
-    my_time = new QTimer(this);
-    connect(my_time,SIGNAL(timeout()),this,SLOT(rcv_msg()));
-    my_time->start(400);
+    my_timer = new QTimer(this);
+    connect(my_timer,SIGNAL(timeout()),this,SLOT(rcve_msg()));
+    my_timer->start(100);
 
 }
 
+Vector_routing::~Vector_routing(){}
 
 
-/*  PACKET STRUCTURE
-* type      | add1  | add2
-* dest      | hop1  | hop2
-* src_add
-*  add_a
-*  add_a
-*/
-
-void Vector_routing::rcv_msg(){
+void Vector_routing::rcve_msg(){
 
     std::string to_d;
 
@@ -311,4 +302,4 @@ void Vector_routing::receive_string_table(std::string  string_to_conv){
     }
 }
 
-
+*/

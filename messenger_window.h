@@ -13,15 +13,17 @@
 #include "rec.h"
 #include <mutex>
 #include "vector_routing.h"
+#include "router.h"
 
 #include "messagedisplay.h"
 
-class Vector_routing;
+class router;
 
 extern BlockingQueue<std::string> q;
 
 class QLineEdit;
-
+class QCheckBox;
+class QLabel;
 class MessageDisplay;
 class ComSender;
 class Rec;
@@ -40,7 +42,7 @@ public:
     std::thread t;
 
     std::vector<uint16_t> sequence_nr;
-
+    void create_buttons();
 signals:
 
 
@@ -59,13 +61,23 @@ private:
     QLineEdit       *line_to_write;
     QGroupBox       *display_object;
     QGroupBox       *type_object;
+    QGroupBox       *choose_rec_object;
     QComboBox       *comboBox_food;
     QComboBox       *comboBox_fun;
     ComSender       *senderClass;
     Rec             *myrec;
     MessageDisplay  *my_display;
-    Vector_routing  *router;
-
+    router          *router1;
+    QCheckBox       *ip1;
+    QCheckBox       *ip2;
+    QCheckBox       *ip3;
+    QCheckBox       *ip4;
+    QCheckBox       *multicast;
+    QLabel          *ip1_label;
+    QLabel          *ip2_label;
+    QLabel          *ip3_label;
+    QLabel          *ip4_label;
+    QLabel          *multicast_label;
 };
 
 #endif // MESSENGER_WINDOW_H
