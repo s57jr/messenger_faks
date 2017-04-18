@@ -12,10 +12,11 @@
 #include "ComSender.h"
 #include "rec.h"
 #include <mutex>
+#include "vector_routing.h"
 
 #include "messagedisplay.h"
 
-
+class Vector_routing;
 
 extern BlockingQueue<std::string> q;
 
@@ -63,6 +64,7 @@ private:
     ComSender       *senderClass;
     Rec             *myrec;
     MessageDisplay  *my_display;
+    Vector_routing  *router;
 
 };
 

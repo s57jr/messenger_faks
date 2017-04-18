@@ -42,9 +42,11 @@ Messenger_window::Messenger_window(QWidget *parent) : QWidget(parent)
 
     setWindowTitle(tr("MessengerPro2"));
 
+    router = new Vector_routing;
+
     my_time = new QTimer(this);
     connect(my_time,SIGNAL(timeout()),this,SLOT(rcv_msg()));
-    my_time->start(400);
+    my_time->start(100);
 
 }
 
@@ -53,14 +55,19 @@ void  Messenger_window::rcv_msg(){
   //  std::string message = q.pop();
   //  std::cout << "Packet of size " << message.size() << " received, message: " << message << std::endl;
 
-    if(myrec->message.size()){
-        myrec->mut.lock();
-                QString qs = QString::fromLocal8Bit(myrec->message.c_str());
-
-                myrec->message = "";
-        myrec->mut.unlock();
+    if(router->message_to_disp.size()){
+        router->m.lock();
+                QString qs = QString::fromLocal8Bit(router->message_to_disp.c_str());
+                router->message_to_disp = "";
+        router->m.unlock();
         my_display->insertPlainText("Person said: " + qs + "\n");
 
+    }else if(router->my_message_to_disp.size()){
+        router->m.lock();
+                QString qs = QString::fromLocal8Bit(router->my_message_to_disp.c_str());
+                router->message_to_disp = "";
+        router->m.unlock();
+        my_display->insertPlainText("You said: " + qs + "\n");
     }
 
 }
@@ -112,8 +119,9 @@ void Messenger_window::emoji_chosen_fun(){
 
 void Messenger_window::send_text(){
     if(!((line_to_write->text() == " ")||(line_to_write->text()== "  ")||(line_to_write->text() == "   ")||(line_to_write->text() == "    ")||(line_to_write->text() == "     ")||(line_to_write->text() == ""))){
-        my_display->insertPlainText("You said: " + line_to_write->text() + "\n");
+        //my_display->insertPlainText("You said: " + line_to_write->text() + "\n");
        // senderClass->SendMessage(line_to_write->text().toStdString());
+        router->send_text(line_to_write->text().toStdString(), '4');
     }
     line_to_write ->clear();
 }

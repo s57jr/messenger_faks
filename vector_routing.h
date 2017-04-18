@@ -32,8 +32,10 @@ public:
     int32_t get_destination_address(int32_t destination);
     void receive_string_table(std::string  string_to_conv);
     void create_sendable_table(std::vector<std::vector<int32_t>> &packet_to_conv, std::string &out_string);
-
+    void send_text(std::string text, char dest);
     std::vector<std::vector<uint32_t>> my_table;
+
+    void  add_to_array(std::string id);
 
     std::vector<std::string> out_string;
     std::vector<std::string> in_string;
@@ -43,6 +45,10 @@ public:
     QThread *my_thread;
     QThread *recv;
     std::thread t;
+
+    std::mutex m;
+    std::string message_to_disp;
+    std::string my_message_to_disp;
 
 
     std::vector<std::string>  decompose_package(std::string packet_in);

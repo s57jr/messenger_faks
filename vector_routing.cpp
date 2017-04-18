@@ -13,7 +13,10 @@ Vector_routing::Vector_routing():
     sequenceNr(10),
     my_address(IP[IP.size()-1]),
     bl_p(0),
-    ACK(false)
+    ACK(false),
+    message_to_disp(""),
+    my_message_to_disp(""),
+    received_package("")
 {
 
     senderClass = new ComSender(IP,PORT,GROUP) ;
@@ -51,20 +54,23 @@ Vector_routing::Vector_routing():
 
 void Vector_routing::rcv_msg(){
 
+    std::string to_d;
 
     if(myrec->message.size()){
         myrec->mut.lock();
-                QString qs = QString::fromLocal8Bit(myrec->message.c_str());
-                received_package = myrec->message.c_str();
+                to_d = myrec->message;
                 myrec->message = "";
         myrec->mut.unlock();
-        my_display->insertPlainText("Person said: " + qs + "\n");
 
-        std::string id = received_package[1]+received_package[2]+received_package[3];
+        std::string id;// = received_package[1]+received_package[2]+received_package[3];
 
-        std::string destination = received_package[0];
+        id.assign(received_package[1],1);
+        id.assign(received_package[2],1);
+        id.assign(received_package[3],1);
 
-        if(received_package[4]=="t"){
+        char destination = received_package[0];
+
+        if(received_package[4]=='t'){
             ACK = true;
         }else{
             ACK = false;
@@ -75,18 +81,24 @@ void Vector_routing::rcv_msg(){
             if(destination == my_address){
 
                 if(!ACK){
-                    received_package[4] = "t";
+                    received_package[4] = 't';
                     received_package[0] = received_package[1];
                     received_package[1] = destination;
                     senderClass->SendMessage(received_package);
+                    m.lock();
+                        message_to_disp =  to_d;
+                    m.unlock();
                     //write to display
                 }else{
                     //write acked message to display
+                    m.lock();
+                        my_message_to_disp = to_d;
+                    m.unlock();
                 }
             }else{
                 senderClass->SendMessage(received_package);
             }
-            add_to_array();
+            add_to_array(id);
         }
     }
 }
@@ -104,7 +116,7 @@ void Vector_routing::send_text(std::string text, char dest){
 }
 
 bool Vector_routing::is_it_in(std::string sequence){
-    for(inz i =0;i< seq_blacklist.size(); i++){
+    for(int i =0;i< seq_blacklist.size(); i++){
         if(sequence == seq_blacklist[i]){
             //drop the package
             return true;
@@ -114,7 +126,7 @@ bool Vector_routing::is_it_in(std::string sequence){
 
 void  Vector_routing::add_to_array(std::string id){
     if(bl_p == 9 )bl_p=0;
-    seq_blacklist[p]=id;
+    seq_blacklist[bl_p]=id;
     bl_p++;
 }
 
