@@ -15,9 +15,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     Messenger_window w;
-    w.resize (400, 400); // initial size
+    w.resize (400, 500); // initial size
     w.setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Ignored);
-    w.setMinimumSize(400,400);
+    w.setMinimumSize(400,450);
     w.show();
 
    return a.exec();

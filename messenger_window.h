@@ -12,7 +12,6 @@
 #include "ComSender.h"
 #include "rec.h"
 #include <mutex>
-#include "vector_routing.h"
 #include "router.h"
 
 #include "messagedisplay.h"
@@ -44,10 +43,15 @@ public:
     std::vector<uint16_t> sequence_nr;
     void create_buttons();
 
+    int num_of_receivers;
+    std::vector<std::string> current_receivers=std::vector<std::string>(0);
+
 signals:
 
 
 public slots:
+    void set_receiver();
+
     void set_display_object();
     void set_type_object();
     void rcv_msg();

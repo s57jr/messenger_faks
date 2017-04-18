@@ -4,7 +4,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <iostream>
-#include "receiver.h"
 #include "BlockingQueue.h"
 
 
@@ -27,18 +26,25 @@ Messenger_window::Messenger_window(QWidget *parent) : QWidget(parent)
     set_type_object();
     create_buttons();
 
+    num_of_receivers=0;
     //signals
 
     connect(comboBox_food,SIGNAL(currentIndexChanged(int)),this,SLOT(emoji_chosen_food()));
     connect(comboBox_fun,SIGNAL(currentIndexChanged(int)),this,SLOT(emoji_chosen_fun()));
     connect(line_to_write,SIGNAL(returnPressed()),this,SLOT(send_text()));
+    connect(ip1,SIGNAL(stateChanged(int)),this,SLOT(set_receiver()));
+    connect(ip2,SIGNAL(stateChanged(int)),this,SLOT(set_receiver()));
+    connect(ip3,SIGNAL(stateChanged(int)),this,SLOT(set_receiver()));
+    connect(ip4,SIGNAL(stateChanged(int)),this,SLOT(set_receiver()));
+    connect(multicast,SIGNAL(stateChanged(int)),this,SLOT(set_receiver()));
+
 
 
 
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(type_object,3,1,2,4,Qt::AlignBottom);
     mainLayout->addWidget(display_object,1,1,5,4,Qt::AlignTop);
-    mainLayout->addWidget(choose_rec_object,2,1,2,4,Qt::AlignBottom);
+    mainLayout->addWidget(choose_rec_object,2,1,1,4,Qt::AlignTop);
     mainLayout->setRowStretch(1,5);
     setLayout(mainLayout);
 
@@ -52,6 +58,31 @@ Messenger_window::Messenger_window(QWidget *parent) : QWidget(parent)
 
 }
 
+void Messenger_window::set_receiver(){
+    current_receivers=std::vector<std::string>(0);
+    if(ip1->checkState()){
+        current_receivers.push_back("1");
+    }
+    if(ip2->checkState()){
+        current_receivers.push_back("2");
+    }
+    if(ip3->checkState()){
+        current_receivers.push_back("3");
+    }
+    if(ip4->checkState()){
+        current_receivers.push_back("4");
+    }
+    if(multicast->checkState()){
+        current_receivers=std::vector<std::string>(0);
+        current_receivers.push_back("1");
+        current_receivers.push_back("2");
+        current_receivers.push_back("3");
+        current_receivers.push_back("4");
+
+
+    }
+}
+
 
 void  Messenger_window::rcv_msg(){
   //  std::string message = q.pop();
@@ -61,14 +92,22 @@ void  Messenger_window::rcv_msg(){
                 QString qs = QString::fromLocal8Bit(router1->message_to_disp.c_str());
                 router1->message_to_disp = "";
         router1->m.unlock();
-        my_display->insertPlainText("Person said: " + qs + "\n");
+        switch(router1->source){
+            case '1': my_display->insertPlainText("ERNEST SAID: " + qs + "\n");break;
+            case '2': my_display->insertPlainText("JOST SAID: " + qs + "\n");break;
+            case '3': my_display->insertPlainText("FLORIAN SAID: " + qs + "\n");break;
+            case '4': my_display->insertPlainText("RAOUL SAID: " + qs + "\n");break;
+
+        }
+
+
 
     }else if(router1->my_message_to_disp.size()){
         router1->m.lock();
                 QString qs = QString::fromLocal8Bit(router1->my_message_to_disp.c_str());
                 router1->my_message_to_disp = "";
         router1->m.unlock();
-        my_display->insertPlainText("You said: " + qs + "\n");
+        my_display->insertPlainText("YOU SAID: " + qs + "\n");
     }
 
 }
@@ -105,9 +144,9 @@ void Messenger_window::set_type_object(){
 
     line_to_write->setFont(QFont(QStringLiteral("Segoe UI Symbol")));
     QGridLayout *layout = new QGridLayout;
-    layout->addWidget(comboBox_food,1,1,1,1);
-    layout->addWidget(comboBox_fun, 1,2,1,1);
-    layout->addWidget(line_to_write,2,1,2,4,Qt::AlignBottom);
+    layout->addWidget(comboBox_food,2,3,1,1, Qt::AlignRight);
+    layout->addWidget(comboBox_fun, 2,4,1,1,Qt::AlignRight);
+    layout->addWidget(line_to_write,3,1,2,4,Qt::AlignBottom);
     type_object->setLayout(layout);
 }
 
@@ -123,7 +162,10 @@ void Messenger_window::send_text(){
         //my_display->insertPlainText("You said: " + line_to_write->text() + "\n");
        // senderClass->SendMessage(line_to_write->text().toStdString());
         std::cout << "sending" << std::endl;
-        router1->send_text(line_to_write->text().toStdString(), "1");
+        for(int t =0 ; t<current_receivers.size();t++){
+            router1->send_text(line_to_write->text().toStdString(), current_receivers[t]);
+        }
+        router1->increment_seq_nr();
     }
     line_to_write ->clear();
 }
@@ -150,7 +192,7 @@ void Messenger_window::setLineEditTextFormat(QLineEdit* lineEdit, const QList<QT
 void Messenger_window::create_buttons(){
 
     choose_rec_object = new QGroupBox(tr("choose receiver"));
-
+    choose_rec_object->setPalette(QPalette(Qt::black    ));
 
     ip1=new QCheckBox;
     ip2=new QCheckBox;
@@ -159,11 +201,17 @@ void Messenger_window::create_buttons(){
     multicast=new QCheckBox;
 
 
-    ip1_label = new QLabel(tr("Florian"));
+    ip1_label = new QLabel(tr("Ernest"));
     ip2_label = new QLabel(tr("Jost"));
-    ip3_label = new QLabel(tr("Ernest"));
+    ip3_label = new QLabel(tr("Florian"));
     ip4_label = new QLabel(tr("Raoul"));
-    multicast_label = new QLabel;
+    multicast_label = new QLabel(tr("To all"));
+
+    ip1_label->setStyleSheet("QLabel { background-color : white; color : blue; }");
+    ip2_label->setStyleSheet("QLabel { background-color : white; color : blue; }");
+    ip3_label->setStyleSheet("QLabel { background-color : white; color : blue; }");
+    ip4_label->setStyleSheet("QLabel { background-color : white; color : blue; }");
+    multicast_label->setStyleSheet("QLabel { background-color : white; color : blue; }");
 
     QGridLayout *layout = new QGridLayout;
 
@@ -171,13 +219,13 @@ void Messenger_window::create_buttons(){
     layout->addWidget(ip2,1,2,1,1);
     layout->addWidget(ip3,1,3,1,1);
     layout->addWidget(ip4,1,4,1,1);
-    layout->addWidget(multicast,5,1,1,1);
+    layout->addWidget(multicast,1,5,1,1);
 
     layout->addWidget(ip1_label,2,1,1,1);
-    layout->addWidget(ip2_label,2,1,1,1);
-    layout->addWidget(ip3_label,2,1,1,1);
-    layout->addWidget(ip4_label,2,1,1,1);
-    layout->addWidget(multicast_label,2,1,1,1);
+    layout->addWidget(ip2_label,2,2,1,1);
+    layout->addWidget(ip3_label,2,3,1,1);
+    layout->addWidget(ip4_label,2,4,1,1);
+    layout->addWidget(multicast_label,2,5,1,1);
 
     choose_rec_object->setLayout(layout);
 }

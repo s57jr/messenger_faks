@@ -6,12 +6,10 @@
 #include "ComSender.h"
 #include "rec.h"
 #include <mutex>
-#include "datatable.h"
 #include <thread>
 #include <cstring>
 #include <unistd.h>
 #include <iostream>
-#include "receiver.h"
 
 #include <QtWidgets>
 #include <QWidget>
@@ -23,31 +21,27 @@
 const std::string IP="192.168.5.2"; //The IP address of this computer
 #define GROUP "228.0.0.0" //The multicast group you want to use
 
-
+class Rec;
 
 class router : public QObject
 {
     Q_OBJECT
 public:
     explicit router(QObject *parent = 0);
-
-    void tick(std::vector<std::vector<uint32_t>> packet, std::vector<std::vector<uint32_t>> &pkt_out);
-    int search_for(std::vector<uint32_t> vect, uint32_t value);
-    int search_in_row(std::vector<std::vector<uint32_t>> vect,int row, uint32_t value);
     int32_t get_destination_address(int32_t destination);
-    void receive_string_table(std::string  string_to_conv);
-    void create_sendable_table(std::vector<std::vector<int32_t>> &packet_to_conv, std::string &out_string);
+    int search_in_row(std::vector<std::vector<uint32_t>> vect,int row, uint32_t value);
+
     void send_text(std::string text, string dest);
     std::vector<std::vector<uint32_t>> my_table;
 
     void  add_to_array(std::string id);
     void  add_ack_to_array(std::string id);
     bool is_it_in_ack(std::string sequence);
-
+    void increment_seq_nr();
 
     std::vector<std::string> out_string;
     std::vector<std::string> in_string;
-
+    char source;
 
     QTimer *my_timer;
     QThread *my_thread;
