@@ -107,7 +107,13 @@ void  Messenger_window::rcv_msg(){
                 QString qs = QString::fromLocal8Bit(router1->my_message_to_disp.c_str());
                 router1->my_message_to_disp = "";
         router1->m.unlock();
-        my_display->insertPlainText("YOU SAID: " + qs + "\n");
+        switch(std::stoi(current_receivers[0])){
+            case 1: my_display->insertPlainText("YOU SAID TO ERNEST: " + qs + "\n");break;
+            case 2: my_display->insertPlainText("YOU SAID TO JOST: " + qs + "\n");break;
+            case 3: my_display->insertPlainText("YOU SAID TO FLORIAN: " + qs + "\n");break;
+            case 4: my_display->insertPlainText("YOU SAID TO RAOUL: " + qs + "\n");break;
+
+        }
     }
 
 }
@@ -164,8 +170,9 @@ void Messenger_window::send_text(){
         std::cout << "sending" << std::endl;
         for(int t =0 ; t<current_receivers.size();t++){
             router1->send_text(line_to_write->text().toStdString(), current_receivers[t]);
+            router1->increment_seq_nr();
+
         }
-        router1->increment_seq_nr();
     }
     line_to_write ->clear();
 }

@@ -58,14 +58,17 @@ void router::rcve_msg(){
 
       std::cout << "printing rec." << to_d <<std::endl;
 
-      std::string id;// = received_package[1]+received_package[2]+received_package[3];
-
+      std::string id ="";
+      id+= std::to_string(to_d[1]);
+      id+= std::to_string(to_d[2]);
+      id+= std::to_string(to_d[3]);
+/*
       id.assign(to_d[1],1);
       id.assign(to_d[2],1);
       id.assign(to_d[3],1);
-
+*/
       char destination = to_d[0];
-      char source = to_d[1];
+      source = to_d[1];
 
       std::cout << destination << std::endl;
 
@@ -145,6 +148,8 @@ bool router::is_it_in(std::string sequence){
           return true;
       }
   }
+  return false;
+
 }
 
 bool router::is_it_in_ack(std::string sequence){
@@ -154,16 +159,17 @@ bool router::is_it_in_ack(std::string sequence){
           return true;
       }
   }
+  return false;
 }
 
 void  router::add_ack_to_array(std::string id){
-  if(bl_p_ack == 99 )bl_p_ack=10;
+  if(bl_p_ack >= 30 )bl_p_ack=10;
   seq_ack_blacklist[bl_p_ack]=id;
   bl_p_ack++;
 }
 
 void  router::add_to_array(std::string id){
-  if(bl_p == 99 )bl_p=10;
+  if(bl_p >= 30 )bl_p=10;
   seq_blacklist[bl_p]=id;
   bl_p++;
 }
