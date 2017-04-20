@@ -18,7 +18,7 @@
 
 class router;
 
-extern BlockingQueue<std::string> q;
+//extern BlockingQueue<std::string> q;
 
 class QLineEdit;
 class QCheckBox;

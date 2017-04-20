@@ -15,7 +15,7 @@ ComSender::ComSender(std::string ip, uint port, std::string group) {
 	this->ip = ip;
 	this->port = port;
 	this->group = group;
-	this->message = "";
+    this->message = "";
 
 }
 
@@ -26,7 +26,7 @@ ComSender::~ComSender() {
 int ComSender::SendMessage(std::string message){
 
 	//HANDSHAKE IS SUCCESSFULL
-this->message = message;
+this->message=message; //.push_back(message);
 
 	return 0;
 
@@ -77,13 +77,14 @@ int ComSender::SendPacket(){
 		//send a packet every 5 seconds
 	while(1){
 		if(this->message.size() > 0){
-			std::string data = message;
+            std::string data = message; //message.back();
+            //message.pop_back();
 			if (sendto(sock, data.c_str(), data.size(), 0, (struct sockaddr*)&multicastSender,sizeof(struct sockaddr_in)) < 0) //sent a UDP packet containing our example data
 					perror("Send to failed");
             std::cout << "Packet of size" << data.size()<< "sent!" << std::endl;
 
 		}
-		this->message = "";
+        this->message = "";
         ::usleep(100);
     }
 

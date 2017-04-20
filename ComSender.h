@@ -39,7 +39,8 @@ private:
 	std::string ip;
 	std::string group;
 	uint port;
-	std::string message;
+   // std::vector<std::string> message;
+    std::string message;
 };
 
 #endif /* LOGIC_COMSENDER_H_ */

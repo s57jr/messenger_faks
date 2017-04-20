@@ -89,9 +89,14 @@ void  Messenger_window::rcv_msg(){
   //  std::cout << "Packet of size " << message.size() << " received, message: " << message << std::endl;
     if(router1->message_to_disp.size()){
         router1->m.lock();
-                QString qs = QString::fromLocal8Bit(router1->message_to_disp.c_str());
+                std::string tmp =router1->message_to_disp.c_str();
+                //QString qs = QString::fromLocal8Bit(router1->message_to_disp.c_str());
                 router1->message_to_disp = "";
         router1->m.unlock();
+
+        //decrypt
+        QString qs = QString::fromLocal8Bit(router1->encr->encryptDecrypt(tmp, router1->encr->get_key(std::to_string(router1->source))).c_str());
+
         switch(router1->source){
             case '1': my_display->insertPlainText("ERNEST SAID: " + qs + "\n");break;
             case '2': my_display->insertPlainText("JOST SAID: " + qs + "\n");break;
@@ -171,7 +176,6 @@ void Messenger_window::send_text(){
         for(int t =0 ; t<current_receivers.size();t++){
             router1->send_text(line_to_write->text().toStdString(), current_receivers[t]);
             router1->increment_seq_nr();
-
         }
     }
     line_to_write ->clear();

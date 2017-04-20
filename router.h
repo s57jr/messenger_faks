@@ -10,6 +10,8 @@
 #include <cstring>
 #include <unistd.h>
 #include <iostream>
+#include "encryption.h"
+#include "encryption.h"
 
 #include <QtWidgets>
 #include <QWidget>
@@ -20,6 +22,7 @@
 #define PORT 14000 //The port you want to use
 const std::string IP="192.168.5.2"; //The IP address of this computer
 #define GROUP "228.0.0.0" //The multicast group you want to use
+
 
 class Rec;
 
@@ -51,6 +54,7 @@ public:
     std::mutex m;
     std::string message_to_disp;
     std::string my_message_to_disp;
+    Encryption      *encr;
 
 
     std::vector<std::string>  decompose_package(std::string packet_in);
